@@ -101,3 +101,5 @@ copilot-dev-days-workshop/
 ---
 
 Adapted from the [Copilot Workshops](https://github-samples.github.io/copilot-workshops/) first-steps workshops by James Montemagno ([github-samples/copilot-workshops](https://github.com/github-samples/copilot-workshops), MIT License).
+
+![Tests](https://github.com/saimadhu511/copilot-dev-days-workshop/actions/workflows/test.yml/badge.svg)

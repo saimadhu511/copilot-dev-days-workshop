@@ -36,6 +36,26 @@ const QUESTIONS = [
     ],
     answer: 1,
   },
+  {
+    question: "Where do GitHub Actions workflow files live in a repository?",
+    options: [".github/actions", ".workflows", "actions/workflows", ".github/workflows"],
+    answer: 3,
+  },
+  {
+    question: "Which event can trigger a workflow when a pull request is opened?",
+    options: ["push", "pull_request", "schedule", "workflow_dispatch"],
+    answer: 1,
+  },
+  {
+    question: "What does a job contain in a GitHub Actions workflow?",
+    options: [
+      "A list of repository collaborators",
+      "The repository's branch protection rules",
+      "Steps that run on the same runner",
+      "A list of open pull requests",
+    ],
+    answer: 2,
+  },
 ];
 
 // Lets Node.js tests load this file. Browsers ignore this block.
