@@ -2,7 +2,18 @@
 // Run them with:  npm test
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { shuffle, isCorrect, calculatePercentage, formatTimeLeft, getGrade, getFeedbackMessage } = require("../src/quiz.js");
+const {
+  shuffle,
+  isCorrect,
+  createQuiz,
+  answerQuestion,
+  advanceQuestion,
+  isQuizFinished,
+  calculatePercentage,
+  formatTimeLeft,
+  getGrade,
+  getFeedbackMessage
+} = require("../src/quiz.js");
 
 test("isCorrect returns true for the right answer", () => {
   assert.equal(isCorrect({ answer: 2 }, 2), true);
@@ -10,6 +21,48 @@ test("isCorrect returns true for the right answer", () => {
 
 test("isCorrect returns false for a wrong answer", () => {
   assert.equal(isCorrect({ answer: 2 }, 0), false);
+});
+
+test("createQuiz initializes a fresh state without reusing the questions array", () => {
+  const questions = [{ answer: 1 }];
+  const state = createQuiz(questions);
+
+  assert.deepEqual(state, { questions, current: 0, score: 0 });
+  assert.notEqual(state.questions, questions);
+});
+
+test("answerQuestion increments score for a correct answer without mutating state", () => {
+  const state = createQuiz([{ answer: 1 }]);
+  const result = answerQuestion(state, 1);
+
+  assert.equal(result.correct, true);
+  assert.deepEqual(result.state, { ...state, score: 1 });
+  assert.deepEqual(state, { questions: [{ answer: 1 }], current: 0, score: 0 });
+});
+
+test("answerQuestion leaves score unchanged for an incorrect answer", () => {
+  const state = createQuiz([{ answer: 1 }]);
+  const result = answerQuestion(state, 0);
+
+  assert.equal(result.correct, false);
+  assert.deepEqual(result.state, state);
+  assert.notEqual(result.state, state);
+});
+
+test("advanceQuestion returns a new state at the next index", () => {
+  const state = createQuiz([{ answer: 0 }, { answer: 1 }]);
+  const nextState = advanceQuestion(state);
+
+  assert.deepEqual(nextState, { ...state, current: 1 });
+  assert.deepEqual(state, { questions: [{ answer: 0 }, { answer: 1 }], current: 0, score: 0 });
+});
+
+test("isQuizFinished detects the end of the question list", () => {
+  const state = createQuiz([{ answer: 0 }]);
+
+  assert.equal(isQuizFinished(state), false);
+  assert.equal(isQuizFinished(advanceQuestion(state)), true);
+  assert.equal(isQuizFinished(createQuiz([])), true);
 });
 
 test("calculatePercentage rounds to a whole number", () => {
