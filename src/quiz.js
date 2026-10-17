@@ -49,6 +49,10 @@ function calculatePercentage(score, total) {
   return Math.round((score / total) * 100);
 }
 
+function isNewBestScore(current, best) {
+  return best === null || current > best;
+}
+
 /**
  * Formats the remaining whole seconds for display.
  */
@@ -87,6 +91,7 @@ if (typeof module !== "undefined" && module.exports) {
     advanceQuestion,
     isQuizFinished,
     calculatePercentage,
+    isNewBestScore,
     formatTimeLeft,
     getGrade,
     getFeedbackMessage
