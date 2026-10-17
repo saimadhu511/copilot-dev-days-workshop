@@ -6,12 +6,14 @@ const startScreen = document.getElementById("start-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const progressText = document.getElementById("progress");
+const timerText = document.getElementById("timer-text");
 const questionText = document.getElementById("question-text");
 const optionsList = document.getElementById("options");
 const feedbackText = document.getElementById("feedback");
 const nextButton = document.getElementById("next-btn");
 const scoreText = document.getElementById("score-text");
 const gradeText = document.getElementById("grade-text");
+let countdownInterval = null;
 
 function showScreen(screenToShow) {
   [startScreen, quizScreen, resultScreen].forEach((screen) => {
@@ -20,6 +22,7 @@ function showScreen(screenToShow) {
 }
 
 function startQuiz() {
+  stopCountdown();
   state.questions = shuffle(QUESTIONS);
   state.current = 0;
   state.score = 0;
@@ -28,11 +31,13 @@ function startQuiz() {
 }
 
 function renderQuestion() {
+  stopCountdown();
   const question = state.questions[state.current];
   progressText.textContent = `Question ${state.current + 1} of ${state.questions.length}`;
   questionText.textContent = question.question;
   feedbackText.textContent = "";
   nextButton.hidden = true;
+  timerText.classList.remove("urgent");
   optionsList.innerHTML = "";
 
   question.options.forEach((option, index) => {
@@ -44,9 +49,53 @@ function renderQuestion() {
     item.appendChild(button);
     optionsList.appendChild(item);
   });
+
+  startCountdown();
+}
+
+function stopCountdown() {
+  if (countdownInterval !== null) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+}
+
+function startCountdown() {
+  const questionIndex = state.current;
+  const deadline = Date.now() + 15000;
+
+  function updateCountdown() {
+    if (state.current !== questionIndex || nextButton.hidden === false) {
+      stopCountdown();
+      return;
+    }
+
+    const secondsLeft = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    timerText.textContent = formatTimeLeft(secondsLeft);
+    timerText.classList.toggle("urgent", secondsLeft <= 5);
+
+    if (secondsLeft === 0) {
+      stopCountdown();
+      timeExpired();
+    }
+  }
+
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 200);
+}
+
+function timeExpired() {
+  const question = state.questions[state.current];
+  const buttons = optionsList.querySelectorAll("button");
+  buttons.forEach((button) => (button.disabled = true));
+  buttons[question.answer].classList.add("correct");
+  feedbackText.textContent = "Time's up!";
+  nextButton.hidden = false;
+  nextButton.focus();
 }
 
 function selectAnswer(selectedIndex, selectedButton) {
+  stopCountdown();
   const question = state.questions[state.current];
   const buttons = optionsList.querySelectorAll("button");
   buttons.forEach((button) => (button.disabled = true));
@@ -75,6 +124,7 @@ function nextQuestion() {
 }
 
 function showResults() {
+  stopCountdown();
   const total = state.questions.length;
   const percentage = calculatePercentage(state.score, total);
   scoreText.textContent = `You scored ${state.score} out of ${total} (${percentage}%)`;
