@@ -10,6 +10,7 @@ const {
   advanceQuestion,
   isQuizFinished,
   calculatePercentage,
+  isNewBestScore,
   formatTimeLeft,
   getGrade,
   getFeedbackMessage
@@ -71,6 +72,16 @@ test("calculatePercentage rounds to a whole number", () => {
 
 test("calculatePercentage returns 0 when there are no questions", () => {
   assert.equal(calculatePercentage(0, 0), 0);
+});
+
+test("isNewBestScore treats a missing best as a new record", () => {
+  assert.equal(isNewBestScore(0, null), true);
+});
+
+test("isNewBestScore only accepts a percentage above the saved best", () => {
+  assert.equal(isNewBestScore(81, 80), true);
+  assert.equal(isNewBestScore(80, 80), false);
+  assert.equal(isNewBestScore(79, 80), false);
 });
 
 test("formatTimeLeft displays the remaining seconds", () => {

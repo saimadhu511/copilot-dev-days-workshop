@@ -52,6 +52,16 @@ h2 {
   font-size: 1.1rem;
 }
 
+.best-score {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.record-message {
+  color: var(--correct);
+  font-weight: 700;
+}
+
 .muted {
   color: var(--muted);
   margin: 0;
